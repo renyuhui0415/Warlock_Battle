@@ -1,5 +1,8 @@
-class StarHui_Game {
+class AcGame {
     constructor(id) {
-    console.log("Hello,World!");
+    this.id = id;
+    this.$ac_game = $('#' + id);
+    this.menu = new AcGameMenu(this);
+    this.playground = new AcGamePlayground(this);
     }
 }
