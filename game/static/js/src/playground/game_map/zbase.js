@@ -8,11 +8,6 @@ class GameMap extends AcGameObject {
         this.ctx.canvas.height = this.playground.height;
         this.playground.$playground.append(this.$canvas);
     }
-    
-    render(){
-        this.ctx.fillStyle = "rgba(0,0,0,0.2)";
-        this.ctx.fillRect(0,0,this.ctx.canvas.width,this.ctx.canvas.height);
-    }
 
     start(){
 
@@ -21,4 +16,9 @@ class GameMap extends AcGameObject {
     update(){
         this.render();
     }
+    render(){
+        this.ctx.fillStyle = "rgba(0,0,0,0.2)";
+        this.ctx.fillRect(0,0,this.ctx.canvas.width,this.ctx.canvas.height);
+    }
+
 }

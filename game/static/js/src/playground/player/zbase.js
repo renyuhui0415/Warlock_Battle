@@ -15,8 +15,7 @@ class Player extends AcGameObject{
         this.speed = speed;
         this.is_me = is_me;
         this.eps = 0.1; //误差
-
-       //this.start();
+        this.cur_skill = null; //是否选择技能
     }
 
     start(){ //第一帧执行
@@ -34,9 +33,36 @@ class Player extends AcGameObject{
             if(e.which === 3){ //如果点击鼠标右键，就调用移动函数
                 outer.move_to(e.clientX,e.clientY);
             }
+            else if(e.which === 1){
+                if(outer.cur_skill === "fireball"){
+                    outer.shoot_fireball(e.clientX,e.clientY);
+                }
+            }
+            outer.cur_skill = null;
+        });
+
+        $(window).keydown(function(e){
+            if(e.which === 81){ //q键 表示选择火球技能
+                outer.cur_skill = "fireball";
+                return false;
+            }
         });
     }
     
+    shoot_fireball(tx, ty) {
+        // 确定火球的参数
+        let x = this.x, y = this.y; // 火球发射点就是当前玩家的位置
+        let radius = this.playground.height * 0.01;
+        let angle = Math.atan2(ty - this.y, tx - this.x);
+        let vx = Math.cos(angle), vy = Math.sin(angle);
+        let color = "orange";
+        let speed = this.playground.height * 0.5;
+        let move_length = this.playground.height * 1.0;
+        //let damage = this.playground.height * 0.01;
+        //new FireBall(this.playground, this, x, y, radius, vx, vy, color, speed, move_length, damage);
+          new FireBall(this.playground,this,x,y,radius,vx,vy,color,speed,move_length);
+}
+
     get_dist(x1,y1,x2,y2){ //求两点直线距离
         let dx = x1 - x2;
         let dy = y1 - y2;
