@@ -11,8 +11,15 @@ class AcGamePlayground{
         this.players = [];
         this.players.push(new Player(this,this.width / 2,this.height / 2,this.height * 0.05,"white",this.height * 0.15,true));
 
+        for(let i = 0;i < 5;i++)
+            this.players.push(new Player(this,this.width / 2,this.height / 2,this.height * 0.05,this.get_random_color(),this.height * 0.15,false));
 
         this.start();
+    }
+
+    get_random_color() {
+        let colors = ["blue","red","orange","green","yellow","purple","brown"];
+        return colors[Math.floor(Math.random() * 7)];
     }
 
     start(){ //好习惯，可以把初始化操作写里面
