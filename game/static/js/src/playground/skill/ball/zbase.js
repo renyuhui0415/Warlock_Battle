@@ -1,4 +1,4 @@
-class FireBall extends AcGameObject{
+class Ball extends AcGameObject{
     constructor(playground,player,x,y,radius,vx,vy,color,speed,move_length,damage){
         super();
         this.playground = playground;
@@ -65,7 +65,12 @@ class FireBall extends AcGameObject{
     render(){
         this.ctx.beginPath();
         this.ctx.arc(this.x,this.y,this.radius,0,Math.PI * 2,false);
-        this.ctx.fillStyle = this.color;
+        let color = this.color;
+        if(color === "orange") {
+            this.ctx.fillStyle = "rgba(255,97,0,1)";
+        } else {
+            this.ctx.fillStyle = "rgba(217,237,245,1)";
+        }
         this.ctx.fill();
     }
 }

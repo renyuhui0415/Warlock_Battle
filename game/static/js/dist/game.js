@@ -32,6 +32,7 @@ class AcGameMenu{
 
     add_listening_events() {
         let outer = this;
+
         this.$single_mode.click(function(){
             outer.hide();
             outer.root.playground.show();
@@ -126,6 +127,49 @@ class GameMap extends AcGameObject {
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 }
+class FireWork extends AcGameObject {
+    constructor(playground,x,y,radius,vx,vy,speed,move_length) {
+        super();
+        this.playground = playground;
+        this.ctx = this.playground.game_map.ctx;
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.vx = vx;
+        this.vy = vy;
+        this.speed = speed;
+        this.move_length = move_length;
+        this.eps = 1;
+        this.gravity = 0.5;
+    }
+
+    start(){
+
+    }
+
+    update() {
+        if(this.move_length < this.eps || this.speed < this.eps) {
+            this.destroy();
+            return false;
+        }
+
+        let moved = Math.min(this.move_length,this.speed * this.timedelta / 1000);
+        this.x += this.vx * moved;
+        this.y += this.vy * moved;
+
+        this.speed *= this.gravity;
+        this.move_length -= moved;
+
+        this.render();
+    }
+
+    render(){
+        this.ctx.beginPath();
+        this.ctx.arc(this.x,this.y,this.radius,0,Math.PI * 2,false);
+        this.ctx.fillStyle = "rgb(Math.floor(Math.random() * 255),Math.floor(Math.random() * 255,Math.floor(Math.random() * 255)";
+        this.ctx.fill();
+    }
+}
 class Particle extends AcGameObject {
     constructor(playground,x,y,radius,vx,vy,color,speed,move_length) {
         super();
@@ -190,6 +234,7 @@ class Player extends AcGameObject {
         this.eps = 0.1;
         this.friction = 0.9;
         this.spent_time = 0;
+        this.cnt = 0;
 
         this.cur_skill = null;
     }
@@ -214,7 +259,9 @@ class Player extends AcGameObject {
                 outer.move_to(e.clientX, e.clientY);
             } else if (e.which === 1) {
                 if (outer.cur_skill === "fireball") {
-                    outer.shoot_fireball(e.clientX, e.clientY);
+                    outer.shoot_ball("fireball",e.clientX, e.clientY);
+                } else if(outer.cur_skill === "iceball") {
+                    outer.shoot_ball("iceball",e.clientX,e.clientY);
                 }
 
                 outer.cur_skill = null;
@@ -222,22 +269,33 @@ class Player extends AcGameObject {
         });
 
         $(window).keydown(function(e) {
+            if (outer.radius < 10) 
+                return false; // 这里监听下如果玩家死了，按q键就没有用了
             if (e.which === 81) {  // q
                 outer.cur_skill = "fireball";
                 return false;
+            } else if(e.which === 87) {
+                outer.cur_skill = "iceball";
             }
         });
     }
 
-    shoot_fireball(tx, ty) {
+    shoot_ball(skill,tx, ty) {
         let x = this.x, y = this.y;
         let radius = this.playground.height * 0.01;
         let angle = Math.atan2(ty - this.y, tx - this.x);
         let vx = Math.cos(angle), vy = Math.sin(angle);
-        let color = "orange";
         let speed = this.playground.height * 0.5;
         let move_length = this.playground.height * 1;
-        new FireBall(this.playground, this, x, y, radius, vx, vy, color, speed, move_length, this.playground.height * 0.01);
+        let color;
+
+        if(skill === "fireball") {
+            color = "orange";
+        } else {
+            color = "white";
+        }
+
+        new Ball(this.playground, this, x, y, radius, vx, vy, color, speed, move_length, this.playground.height * 0.01);
     }
 
     get_dist(x1, y1, x2, y2) {
@@ -256,7 +314,7 @@ class Player extends AcGameObject {
     is_attacked(angle, damage) {
         for (let i = 0; i < 20 + Math.random() * 10; i ++ ) {
             let x = this.x, y = this.y;
-            let radius = this.radius * Math.random() * 0.15;
+            let radius = this.radius * Math.random() * 0.16;
             let angle = Math.PI * 2 * Math.random();
             let vx = Math.cos(angle), vy = Math.sin(angle);
             let color = this.color;
@@ -264,6 +322,7 @@ class Player extends AcGameObject {
             let move_length = this.radius * Math.random() * 5;
             new Particle(this.playground, x, y, radius, vx, vy, color, speed, move_length);
         }
+        let color = this.color;
         this.radius -= damage;
         if (this.radius < 10) {
             this.destroy();
@@ -272,16 +331,37 @@ class Player extends AcGameObject {
         this.damage_x = Math.cos(angle);
         this.damage_y = Math.sin(angle);
         this.damage_speed = damage * 100;
-        this.speed *= 1.15;
+        let num = 1;
+        if(color === "orange") {
+            num = 1.03;
+        } else {
+            num = 0.85;
+        }
+        this.speed *= num;
     }
 
     update() {
+        this.cnt += 1;
+        if(this.cnt % 10 === 0) {
+            let x = this.playground.width * Math.random();
+            let y = this.playground.height * Math.random();
+
+            new Star(this.playground,x,y);
+            }
+
         this.spent_time += this.timedelta / 1000;
         if (!this.is_me && this.spent_time > 4 && Math.random() < 1 / 300.0) {
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
-            let tx = player.x + player.speed * this.vx * this.timedelta / 1000 * 0.3;
+            let tx = player.x + player.speed * this.vx * this.timedelta / 1001 * 0.3;
             let ty = player.y + player.speed * this.vy * this.timedelta / 1000 * 0.3;
-            this.shoot_fireball(tx, ty);
+            let skill;
+            if(Math.random() < 0.5) {
+                skill = "fireball";
+            } else {
+                skill = "iceball";
+            }
+
+            this.shoot_ball(skill,tx, ty);
         }
 
         if (this.damage_speed > 10) {
@@ -324,7 +404,7 @@ class Player extends AcGameObject {
         }
     }
 }
-class FireBall extends AcGameObject{
+class Ball extends AcGameObject{
     constructor(playground,player,x,y,radius,vx,vy,color,speed,move_length,damage){
         super();
         this.playground = playground;
@@ -391,7 +471,52 @@ class FireBall extends AcGameObject{
     render(){
         this.ctx.beginPath();
         this.ctx.arc(this.x,this.y,this.radius,0,Math.PI * 2,false);
-        this.ctx.fillStyle = this.color;
+        let color = this.color;
+        if(color === "orange") {
+            this.ctx.fillStyle = "rgba(255,97,0,1)";
+        } else {
+            this.ctx.fillStyle = "rgba(217,237,245,1)";
+        }
+        this.ctx.fill();
+    }
+}
+class Stab extends AcGameObject {
+    constructor(playground,x,y) {
+        super();
+        this.playground = playground;
+        this.ctx = this.playground.game_map.ctx;
+        this.x = x;
+        this.y = y;
+    }
+
+    start() {
+        
+    }
+
+    update() {
+        this.ctx.beginPath();
+        this.ctx.arc(this.x,this.y,this.playground.height * 0.001,0,Math.PI * 2,false);
+        this.ctx.fillStyle = "rgba(255,255,255,0.2)"
+        this.ctx.fill();
+    }
+}
+class Star extends AcGameObject {
+    constructor(playground,x,y) {
+        super();
+        this.playground = playground;
+        this.ctx = this.playground.game_map.ctx;
+        this.x = x;
+        this.y = y;
+    }
+
+    start() {
+
+    }
+
+    update() {
+        this.ctx.beginPath();
+        this.ctx.arc(this.x,this.y,this.playground.height * 0.001,0,Math.PI * 2,false);
+        this.ctx.fillStyle = "rgba(255,255,255,0.2)"
         this.ctx.fill();
     }
 }
@@ -400,7 +525,7 @@ class AcGamePlayground{
         this.root = root;
         this.$playground = $(`<div class="ac-game-playground"></div>`);
 
-        //this.hide(); //默认游戏界面是关闭的
+        this.hide(); //默认游戏界面是关闭的
         this.root.$ac_game.append(this.$playground);
         this.width = this.$playground.width();
         this.height = this.$playground.height();
@@ -434,7 +559,7 @@ export class AcGame {
     constructor(id) {
     this.id = id;
     this.$ac_game = $('#' + id);
-    // this.menu = new AcGameMenu(this);
+    this.menu = new AcGameMenu(this);
     this.playground = new AcGamePlayground(this);
     }
 }

@@ -32,6 +32,7 @@ class AcGameMenu{
 
     add_listening_events() {
         let outer = this;
+
         this.$single_mode.click(function(){
             outer.hide();
             outer.root.playground.show();

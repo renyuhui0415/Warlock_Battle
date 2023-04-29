@@ -18,6 +18,7 @@ class Player extends AcGameObject {
         this.eps = 0.1;
         this.friction = 0.9;
         this.spent_time = 0;
+        this.cnt = 0;
 
         this.cur_skill = null;
     }
@@ -42,7 +43,9 @@ class Player extends AcGameObject {
                 outer.move_to(e.clientX, e.clientY);
             } else if (e.which === 1) {
                 if (outer.cur_skill === "fireball") {
-                    outer.shoot_fireball(e.clientX, e.clientY);
+                    outer.shoot_ball("fireball",e.clientX, e.clientY);
+                } else if(outer.cur_skill === "iceball") {
+                    outer.shoot_ball("iceball",e.clientX,e.clientY);
                 }
 
                 outer.cur_skill = null;
@@ -50,22 +53,33 @@ class Player extends AcGameObject {
         });
 
         $(window).keydown(function(e) {
+            if (outer.radius < 10) 
+                return false; // 这里监听下如果玩家死了，按q键就没有用了
             if (e.which === 81) {  // q
                 outer.cur_skill = "fireball";
                 return false;
+            } else if(e.which === 87) {
+                outer.cur_skill = "iceball";
             }
         });
     }
 
-    shoot_fireball(tx, ty) {
+    shoot_ball(skill,tx, ty) {
         let x = this.x, y = this.y;
         let radius = this.playground.height * 0.01;
         let angle = Math.atan2(ty - this.y, tx - this.x);
         let vx = Math.cos(angle), vy = Math.sin(angle);
-        let color = "orange";
         let speed = this.playground.height * 0.5;
         let move_length = this.playground.height * 1;
-        new FireBall(this.playground, this, x, y, radius, vx, vy, color, speed, move_length, this.playground.height * 0.01);
+        let color;
+
+        if(skill === "fireball") {
+            color = "orange";
+        } else {
+            color = "white";
+        }
+
+        new Ball(this.playground, this, x, y, radius, vx, vy, color, speed, move_length, this.playground.height * 0.01);
     }
 
     get_dist(x1, y1, x2, y2) {
@@ -84,7 +98,7 @@ class Player extends AcGameObject {
     is_attacked(angle, damage) {
         for (let i = 0; i < 20 + Math.random() * 10; i ++ ) {
             let x = this.x, y = this.y;
-            let radius = this.radius * Math.random() * 0.15;
+            let radius = this.radius * Math.random() * 0.16;
             let angle = Math.PI * 2 * Math.random();
             let vx = Math.cos(angle), vy = Math.sin(angle);
             let color = this.color;
@@ -92,6 +106,7 @@ class Player extends AcGameObject {
             let move_length = this.radius * Math.random() * 5;
             new Particle(this.playground, x, y, radius, vx, vy, color, speed, move_length);
         }
+        let color = this.color;
         this.radius -= damage;
         if (this.radius < 10) {
             this.destroy();
@@ -100,16 +115,37 @@ class Player extends AcGameObject {
         this.damage_x = Math.cos(angle);
         this.damage_y = Math.sin(angle);
         this.damage_speed = damage * 100;
-        this.speed *= 1.15;
+        let num = 1;
+        if(color === "orange") {
+            num = 1.03;
+        } else {
+            num = 0.85;
+        }
+        this.speed *= num;
     }
 
     update() {
+        this.cnt += 1;
+        if(this.cnt % 10 === 0) {
+            let x = this.playground.width * Math.random();
+            let y = this.playground.height * Math.random();
+
+            new Star(this.playground,x,y);
+            }
+
         this.spent_time += this.timedelta / 1000;
         if (!this.is_me && this.spent_time > 4 && Math.random() < 1 / 300.0) {
             let player = this.playground.players[Math.floor(Math.random() * this.playground.players.length)];
-            let tx = player.x + player.speed * this.vx * this.timedelta / 1000 * 0.3;
+            let tx = player.x + player.speed * this.vx * this.timedelta / 1001 * 0.3;
             let ty = player.y + player.speed * this.vy * this.timedelta / 1000 * 0.3;
-            this.shoot_fireball(tx, ty);
+            let skill;
+            if(Math.random() < 0.5) {
+                skill = "fireball";
+            } else {
+                skill = "iceball";
+            }
+
+            this.shoot_ball(skill,tx, ty);
         }
 
         if (this.damage_speed > 10) {
