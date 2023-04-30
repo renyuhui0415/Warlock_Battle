@@ -96,7 +96,9 @@ class Player extends AcGameObject {
     }
 
     is_attacked(angle, damage) {
-        for (let i = 0; i < 20 + Math.random() * 10; i ++ ) {
+        const attacked_bgm = new Audio("/static/audio/playground/hitted.mp3");
+        attacked_bgm.play();
+        for (let i = 1; i < 20 + Math.random() * 10; i ++ ) {
             let x = this.x, y = this.y;
             let radius = this.radius * Math.random() * 0.16;
             let angle = Math.PI * 2 * Math.random();
@@ -131,7 +133,7 @@ class Player extends AcGameObject {
             let y = this.playground.height * Math.random();
 
             new Star(this.playground,x,y);
-            }
+        }
 
         this.spent_time += this.timedelta / 1000;
         if (!this.is_me && this.spent_time > 4 && Math.random() < 1 / 300.0) {

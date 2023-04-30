@@ -127,49 +127,6 @@ class GameMap extends AcGameObject {
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 }
-class FireWork extends AcGameObject {
-    constructor(playground,x,y,radius,vx,vy,speed,move_length) {
-        super();
-        this.playground = playground;
-        this.ctx = this.playground.game_map.ctx;
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.vx = vx;
-        this.vy = vy;
-        this.speed = speed;
-        this.move_length = move_length;
-        this.eps = 1;
-        this.gravity = 0.5;
-    }
-
-    start(){
-
-    }
-
-    update() {
-        if(this.move_length < this.eps || this.speed < this.eps) {
-            this.destroy();
-            return false;
-        }
-
-        let moved = Math.min(this.move_length,this.speed * this.timedelta / 1000);
-        this.x += this.vx * moved;
-        this.y += this.vy * moved;
-
-        this.speed *= this.gravity;
-        this.move_length -= moved;
-
-        this.render();
-    }
-
-    render(){
-        this.ctx.beginPath();
-        this.ctx.arc(this.x,this.y,this.radius,0,Math.PI * 2,false);
-        this.ctx.fillStyle = "rgb(Math.floor(Math.random() * 255),Math.floor(Math.random() * 255,Math.floor(Math.random() * 255)";
-        this.ctx.fill();
-    }
-}
 class Particle extends AcGameObject {
     constructor(playground,x,y,radius,vx,vy,color,speed,move_length) {
         super();
@@ -312,7 +269,9 @@ class Player extends AcGameObject {
     }
 
     is_attacked(angle, damage) {
-        for (let i = 0; i < 20 + Math.random() * 10; i ++ ) {
+        const attacked_bgm = new Audio("/static/audio/playground/hitted.mp3");
+        attacked_bgm.play();
+        for (let i = 1; i < 20 + Math.random() * 10; i ++ ) {
             let x = this.x, y = this.y;
             let radius = this.radius * Math.random() * 0.16;
             let angle = Math.PI * 2 * Math.random();
@@ -347,7 +306,7 @@ class Player extends AcGameObject {
             let y = this.playground.height * Math.random();
 
             new Star(this.playground,x,y);
-            }
+        }
 
         this.spent_time += this.timedelta / 1000;
         if (!this.is_me && this.spent_time > 4 && Math.random() < 1 / 300.0) {
@@ -480,26 +439,6 @@ class Ball extends AcGameObject{
         this.ctx.fill();
     }
 }
-class Stab extends AcGameObject {
-    constructor(playground,x,y) {
-        super();
-        this.playground = playground;
-        this.ctx = this.playground.game_map.ctx;
-        this.x = x;
-        this.y = y;
-    }
-
-    start() {
-        
-    }
-
-    update() {
-        this.ctx.beginPath();
-        this.ctx.arc(this.x,this.y,this.playground.height * 0.001,0,Math.PI * 2,false);
-        this.ctx.fillStyle = "rgba(255,255,255,0.2)"
-        this.ctx.fill();
-    }
-}
 class Star extends AcGameObject {
     constructor(playground,x,y) {
         super();
@@ -531,10 +470,10 @@ class AcGamePlayground{
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
         this.players = [];
-        this.players.push(new Player(this,this.width / 2,this.height / 2,this.height * 0.05,"white",this.height * 0.15,true));
+        this.players.push(new Player(this,this.width / 2,this.height / 2,this.height * 0.06,"white",this.height * 0.15,true));
 
-        for(let i = 0;i < 5;i++)
-            this.players.push(new Player(this,this.width / 2,this.height / 2,this.height * 0.05,this.get_random_color(),this.height * 0.15,false));
+        for(let i = 0;i < 7;i++)
+            this.players.push(new Player(this,this.width / 2,this.height / 2,this.height * 0.06,this.get_random_color(),this.height * 0.15,false));
 
         this.start();
     }
