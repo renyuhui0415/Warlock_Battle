@@ -327,6 +327,14 @@ class Player extends AcGameObject {
             this.move_length = 0;
             this.x += this.damage_x * this.damage_speed * this.timedelta / 1000;
             this.y += this.damage_y * this.damage_speed * this.timedelta / 1000;
+
+            if(this.x < 0) {
+                this.x = 0;
+            }
+            if(this.y < 0) {
+                this.y = 0;
+            }
+
             this.damage_speed *= this.friction;
         } else {
             if (this.move_length < this.eps) {
@@ -484,10 +492,10 @@ class AcGamePlayground{
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
         this.players = [];
-        this.players.push(new Player(this,this.width / 2,this.height / 2,this.height * 0.06,"white",this.height * 0.15,true));
+        this.players.push(new Player(this,this.width * Math.random(),this.height * Math.random(),this.height * 0.06,"white",this.height * 0.15,true));
 
         for(let i = 0;i < 7;i++)
-            this.players.push(new Player(this,this.width / 2,this.height / 2,this.height * 0.06,this.get_random_color(),this.height * 0.15,false));
+            this.players.push(new Player(this,this.width * Math.random(),this.height * Math.random(),this.height * 0.06,this.get_random_color(),this.height * 0.15,false));
     }
 
     hide(){ //关闭游戏界面

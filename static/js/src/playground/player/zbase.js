@@ -156,6 +156,14 @@ class Player extends AcGameObject {
             this.move_length = 0;
             this.x += this.damage_x * this.damage_speed * this.timedelta / 1000;
             this.y += this.damage_y * this.damage_speed * this.timedelta / 1000;
+
+            if(this.x < 0) {
+                this.x = 0;
+            }
+            if(this.y < 0) {
+                this.y = 0;
+            }
+
             this.damage_speed *= this.friction;
         } else {
             if (this.move_length < this.eps) {
