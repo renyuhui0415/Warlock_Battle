@@ -331,8 +331,15 @@ class Player extends AcGameObject {
             if(this.x < 0) {
                 this.x = 0;
             }
+            if(this.x > this.playground.width) {
+                this.x = this.playground.width;
+            }
+
             if(this.y < 0) {
                 this.y = 0;
+            }
+            if(this.y > this.playground.height){
+                this.y = this.playground.height;
             }
 
             this.damage_speed *= this.friction;
