@@ -36,11 +36,13 @@ class Settings{
             注册
         </div>
         <br>
-        <div class="ac-game-settings-acwing">
-            <img width="40" src="https://app5372.acapp.acwing.com.cn/static/image/settings/acwing_logo.png">
-            <br>
-            <div>
-                AcWing一键登录
+        <div class="ac-game-settings-third-party-logins">
+            <div class="image-wrapper">
+                <img width="40" src="https://app5372.acapp.acwing.com.cn/static/image/settings/acwing_logo.png" class="acwing-logo">
+                <img width="40" src="https://app5372.acapp.acwing.com.cn/static/image/settings/qq_logo.png" class="qq-logo">
+            </div>
+            <div class="text-wrapper">
+                <div>第三方一键登录</div>
             </div>
         </div>
     </div>
@@ -74,11 +76,13 @@ class Settings{
             登录
         </div>
         <br>
-        <div class="ac-game-settings-acwing">
-            <img width="30" src="https://app165.acapp.acwing.com.cn/static/image/settings/acwing_logo.png">
-            <br>
-            <div>
-                AcWing一键登录
+        <div class="ac-game-settings-third-party-logins">
+            <div class="image-wrapper">
+                <img width="30" src="https://app165.acapp.acwing.com.cn/static/image/settings/acwing_logo.png" class="acwing-logo">
+                <img width="30" src="https://app5372.acapp.acwing.com.cn/static/image/settings/qq_logo.png" class="qq-logo">
+            </div>
+            <div class="text-wrapper">
+                <div>第三方一键登录</div>
             </div>
         </div>
     </div>
@@ -104,6 +108,10 @@ class Settings{
 
         this.$register.hide();
 
+        this.$acwing_login = this.$settings.find(".ac-game-settings-third-party-logins .image-wrapper .acwing-logo");
+        this.$qq_login = this.$settings.find(".ac-game-settings-third-party-logins .image-wrapper .qq-logo");
+
+
         this.root.$ac_game.append(this.$settings);
         this.start();
     }
@@ -114,8 +122,16 @@ class Settings{
     }
 
     add_listening_events(){
+        let outer = this;
         this.add_listening_events_login();
         this.add_listening_events_register();
+
+        this.$acwing_login.click(function(){
+            outer.acwing_login();
+        });
+        this.$qq_login.click(function(){
+            outer.qq_login();
+        });
     }
 
     add_listening_events_login(){ //监听登录页面点击注册事件，需要由登录界面变成注册界面
@@ -138,6 +154,22 @@ class Settings{
         this.$register_submit.click(function(){
             outer.register_on_remote();
         });
+    }
+
+    acwing_login(){
+        $.ajax({
+            url: "https://app5372.acapp.acwing.com.cn/settings/acwing/web/apply_code/",
+            type: "GET",
+            success: function(resp){
+                if(resp.result === "success") {
+                    window.location.replace(resp.apply_code_url);
+                }
+            }
+        });
+    }
+
+    qq_login(){
+        console.log("qq login");
     }
 
     login_on_remote() {  // 在远程服务器上登录
