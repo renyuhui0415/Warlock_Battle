@@ -21,11 +21,11 @@ def receive_code(request):
     apply_access_token_url = "https://graph.qq.com/oauth2.0/token"
     params = {
         'grant_type': "authorization_code",
-        'client_id': "102052672",
-        'client_secret': "Hg6Y0StMmATiu4DK",
+        'client_id': "***",
+        'clinet_secret': "***",
         'code': code,
         'redirect_uri': "https://www.renyuhui.top/settings/qq/receive_code/",
-        'fmt' : "json"
+        'fmt' : "json" 
     }
 
     access_token_res = requests.get(apply_access_token_url,params=params).json()
@@ -50,7 +50,7 @@ def receive_code(request):
     get_userinfo_url = "https://graph.qq.com/user/get_user_info"
     params = {
             'access_token': access_token,
-            'oauth_consumer_key': "102052672",
+            'oauth_consumer_key': "***",
             'openid': openid,
             'fmt': "json"
     }

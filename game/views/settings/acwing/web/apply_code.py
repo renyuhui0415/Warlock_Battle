@@ -11,7 +11,7 @@ def get_state(): #获取随机state，可以过滤掉其他人的恶意攻击
 
 def apply_code(requeset):
     appid="5372" #client_id 
-    redirect_uri = quote("https://app5372.acapp.acwing.com.cn/settings/acwing/web/receive_code/") #重定向链接
+    redirect_uri = quote("https://www.renyuhui.top/settings/acwing/web/receive_code/") #重定向链接
     scope = "userinfo" #获取信息范围
     state = get_state() 
 

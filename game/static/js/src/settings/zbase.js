@@ -1,5 +1,9 @@
 class Settings{
     constructor(root) {
+        if(window.location.host === "app5372.acapp.acwing.com.cn") {
+            window.location.replace("https://www.renyuhui.top/"); //如果当前访问链接为acapp的话，那么就跳转到自己的域名
+        }
+
         this.root = root;
         this.platform = "WEB";
 
@@ -38,8 +42,8 @@ class Settings{
         <br>
         <div class="ac-game-settings-third-party-logins">
             <div class="image-wrapper">
-                <img width="40" src="https://app5372.acapp.acwing.com.cn/static/image/settings/acwing_logo.png" class="acwing-logo">
-                <img width="40" src="https://app5372.acapp.acwing.com.cn/static/image/settings/qq_logo.png" class="qq-logo">
+                <img width="40" src="https://www.renyuhui.top/static/image/settings/acwing_logo.png" class="acwing-logo">
+                <img width="40" src="https://www.renyuhui.top/static/image/settings/qq_logo.png" class="qq-logo">
             </div>
             <div class="text-wrapper">
                 <div>第三方一键登录</div>
@@ -79,7 +83,7 @@ class Settings{
         <div class="ac-game-settings-third-party-logins">
             <div class="image-wrapper">
                 <img width="30" src="https://app165.acapp.acwing.com.cn/static/image/settings/acwing_logo.png" class="acwing-logo">
-                <img width="30" src="https://app5372.acapp.acwing.com.cn/static/image/settings/qq_logo.png" class="qq-logo">
+                <img width="30" src="https://www.renyuhui.top/static/image/settings/qq_logo.png" class="qq-logo">
             </div>
             <div class="text-wrapper">
                 <div>第三方一键登录</div>
@@ -162,7 +166,7 @@ class Settings{
 
     acwing_login(){
         $.ajax({
-            url: "https://app5372.acapp.acwing.com.cn/settings/acwing/web/apply_code/",
+            url: "https://www.renyuhui.top/settings/acwing/web/apply_code/",
             type: "GET",
             success: function(resp){
                 if(resp.result === "success") {
@@ -173,7 +177,15 @@ class Settings{
     }
 
     qq_login(){
-        console.log("qq login");
+        $.ajax({
+            url: "https://www.renyuhui.top/settings/qq/apply_code/",
+            type: "GET",
+            success: function(resp){
+                if(resp.result === "success"){
+                    window.location.replace(resp.apply_code_url);
+                }
+            }
+        }); 
     }
 
     login_on_remote() {  // 在远程服务器上登录
@@ -183,7 +195,7 @@ class Settings{
         this.$login_error_message.empty();
 
         $.ajax({
-            url: "https://app5372.acapp.acwing.com.cn/settings/login/",
+            url: "https://www.renyuhui.top/settings/login/",
             type: "GET",
             data: {
                 username: username,
@@ -204,7 +216,7 @@ class Settings{
         if(this.platform === "ACAPP") return false;
 
         $.ajax({
-            url: "https://app5372.acapp.acwing.com.cn/settings/logout/",
+            url: "https://www.renyuhui.top/settings/logout/",
             success: function(resp){
                 console.log(resp);
                 if(resp.result === "success") {
@@ -221,7 +233,7 @@ class Settings{
         let password_confirm = this.$register_password_confirm.val();
 
         $.ajax({
-            url: "https://app5372.acapp.acwing.com.cn/settings/register/",
+            url: "https://www.renyuhui.top/settings/register/",
             type: "GET",
             data: {
                 username: username,
@@ -269,7 +281,7 @@ class Settings{
         let outer = this;
 
         $.ajax({
-            url: "https://app5372.acapp.acwing.com.cn/settings/acwing/acapp/apply_code/",
+            url: "https://www.renyuhui.top/settings/acwing/acapp/apply_code/",
             type: "GET",
             success: function(resp){
                 if(resp.result === "success"){
@@ -283,7 +295,7 @@ class Settings{
         let outer = this;
 
         $.ajax({
-            url: "https://app5372.acapp.acwing.com.cn/settings/getinfo/",
+            url: "https://www.renyuhui.top/settings/getinfo/",
             type: "GET",
             data: {
                 platform: outer.platform,
