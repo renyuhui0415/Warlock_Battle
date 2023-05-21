@@ -37,7 +37,7 @@ class AcGamePlayground{
         }
     }
 
-    show(){ //打开游戏界面
+    show(mode){ //打开游戏界面
         this.$playground.show();
 
         this.resize();
@@ -46,10 +46,20 @@ class AcGamePlayground{
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
         this.players = [];
-        this.players.push(new Player(this,this.width * Math.random() / this.scale,Math.random(),0.06,"white",0.15,true));
+        this.players.push(new Player(this,this.width * Math.random() / this.scale,Math.random(),0.06,"white",0.15,"me",this.root.settings.username,this.root.settings.photo));
 
-        for(let i = 0;i < 7;i++)
-            this.players.push(new Player(this,this.width * Math.random() / this.scale,Math.random(),0.06,this.get_random_color(),0.15,false));
+        if(mode === "single mode") {
+            for(let i = 0;i < 7;i++)
+                this.players.push(new Player(this,this.width * Math.random() / this.scale,Math.random(),0.06,this.get_random_color(),0.15,"robot"));
+        } else if(mode === "multi mode") {
+            let outer = this;
+            this.mps = new MultiPlayerSocket(this);
+            this.mps.uuid = this.players[0].uuid;
+
+            this.mps.ws.onopen = function() {
+                outer.mps.send_create_player(outer.root.settings.username,outer.root.settings.photo);
+            }
+        }
     }
 
     hide(){ //关闭游戏界面

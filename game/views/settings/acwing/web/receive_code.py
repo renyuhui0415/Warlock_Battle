@@ -6,56 +6,48 @@ from game.models.player.player import Player
 from django.contrib.auth import login
 from random import randint
 
+
 def receive_code(request):
     data = request.GET
     code = data.get('code')
     state = data.get('state')
 
-    if not cache.has_key(state): #判断是不是其他人恶意攻击，是的话返回原来的页面
+    if not cache.has_key(state):
         return redirect("index")
-    cache.delete(state) #如果是自己发的，通过后删除，一对一关系
+    cache.delete(state)
 
-    #python库，携带下面三个参数向 该链接发送GET请求
     apply_access_token_url = "https://www.acwing.com/third_party/api/oauth2/access_token/"
     params = {
         'appid': "5372",
-        'secret': "15f0fdd6cc554874bb1868fcfca53074",
+        'secret': "c46e19eee61a46e19b9c8e86fecab3ee",
         'code': code
     }
 
-    #把返回结果变成字典
-    access_token_res = requests.get(apply_access_token_url,params=params).json()
+    access_token_res = requests.get(apply_access_token_url, params=params).json()
 
-    #存数据
     access_token = access_token_res['access_token']
-    openid = access_token_res['openid'] #相当于身份证
+    openid = access_token_res['openid']
 
-    #数据库是否已经存在该用户，存在直接登录
     players = Player.objects.filter(openid=openid)
-    if players.exists():
-        login(request,players[0].user)
+    if players.exists():  # 如果该用户已存在，则无需重新获取信息，直接登录即可
+        login(request, players[0].user)
         return redirect("index")
 
-    #拿着access_token + openid 去资源服务器调用用户信息
     get_userinfo_url = "https://www.acwing.com/third_party/api/meta/identity/getinfo/"
     params = {
-        'access_token': access_token,
-        'openid': openid
+        "access_token": access_token,
+        "openid": openid
     }
-
-    #存储数据
-    userinfo_res = requests.get(get_userinfo_url,params=params).json()
+    userinfo_res = requests.get(get_userinfo_url, params=params).json()
     username = userinfo_res['username']
     photo = userinfo_res['photo']
 
-    #反正用户名重复
-    while User.objects.filter(username=username).exists():
-        username += str(randint(0,9))
+    while User.objects.filter(username=username).exists():  # 找到一个新用户名
+        username += str(randint(0, 9))
 
-    #创建用户并登录
     user = User.objects.create(username=username)
-    player = Player.objects.create(user=user,photo=photo,openid=openid)
+    player = Player.objects.create(user=user, photo=photo, openid=openid)
 
-    login(request,user)
-
+    login(request, user)
     return redirect("index")
+

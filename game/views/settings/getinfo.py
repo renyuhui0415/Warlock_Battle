@@ -27,7 +27,7 @@ def getinfo_web(request):
 def getinfo(request):
     platform = request.GET.get('platform')
 
-    if(platform == 'ACAPP'):
+    if(platform == "ACAPP"):
         return getinfo_acapp(request)
     elif (platform == "WEB"):
         return getinfo_web(request)
