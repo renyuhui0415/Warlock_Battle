@@ -38,21 +38,28 @@ class AcGamePlayground{
     }
 
     show(mode){ //打开游戏界面
+        let outer = this;
         this.$playground.show();
-
-        this.resize();
 
         this.width = this.$playground.width();
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
+
+        this.mode = mode;
+        this.state = "waiting"; //waiting -> fighting -> over
+        this.notice_board = new NoticeBoard(this);
+        this.player_count = 0;
+
+        this.resize();
+
+
         this.players = [];
-        this.players.push(new Player(this,this.width * Math.random() / this.scale,Math.random(),0.06,"white",0.15,"me",this.root.settings.username,this.root.settings.photo));
+        this.players.push(new Player(this,this.width / 2 / this.scale,0.5,0.06,"white",0.15,"me",this.root.settings.username,this.root.settings.photo));
 
         if(mode === "single mode") {
             for(let i = 0;i < 7;i++)
                 this.players.push(new Player(this,this.width * Math.random() / this.scale,Math.random(),0.06,this.get_random_color(),0.15,"robot"));
         } else if(mode === "multi mode") {
-            let outer = this;
             this.mps = new MultiPlayerSocket(this);
             this.mps.uuid = this.players[0].uuid;
 

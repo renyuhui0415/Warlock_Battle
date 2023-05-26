@@ -202,7 +202,6 @@ class Settings{
                 password: password,
             },
             success: function(resp) {
-                console.log(resp);
                 if (resp.result === "success") {
                     location.reload();
                 } else {
@@ -213,17 +212,19 @@ class Settings{
     }
 
     logout_on_remote(){
-        if(this.platform === "ACAPP") return false;
+        if(this.platform === "ACAPP") {
+            this.root.AcWingOS.api.window.close();
+        } else {
 
-        $.ajax({
-            url: "https://www.renyuhui.top/settings/logout/",
-            success: function(resp){
-                console.log(resp);
-                if(resp.result === "success") {
-                    location.reload();
+            $.ajax({
+                url: "https://www.renyuhui.top/settings/logout/",
+                success: function(resp){
+                    if(resp.result === "success") {
+                        location.reload();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     register_on_remote(){
@@ -241,7 +242,6 @@ class Settings{
                 password_confirm: password_confirm,
             },
             success: function(resp){
-                console.log(resp);
                 if(resp.result === "success"){
                     location.reload();
                 } else {
@@ -265,8 +265,6 @@ class Settings{
         let outer = this;
 
         outer.root.AcWingOS.api.oauth2.authorize(appid, redirect_uri, scope, state, function(resp){
-            console.log("acapp login");
-            console.log(resp)
 
             if(resp.result === "success"){
                 outer.username = resp.username;
@@ -285,7 +283,7 @@ class Settings{
             type: "GET",
             success: function(resp){
                 if(resp.result === "success"){
-                     outer.acapp_login(resp.appid, resp.redirect_uri, resp.scope, resp.state);
+                    outer.acapp_login(resp.appid, resp.redirect_uri, resp.scope, resp.state);
                 }
             }
         });
