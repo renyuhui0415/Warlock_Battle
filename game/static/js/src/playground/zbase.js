@@ -57,7 +57,7 @@ class AcGamePlayground{
         this.players.push(new Player(this,this.width / 2 / this.scale,0.5,0.06,"white",0.15,"me",this.root.settings.username,this.root.settings.photo));
 
         if(mode === "single mode") {
-            for(let i = 0;i < 7;i++)
+            for(let i = 0;i < 8;i++)
                 this.players.push(new Player(this,this.width * Math.random() / this.scale,Math.random(),0.06,this.get_random_color(),0.15,"robot"));
         } else if(mode === "multi mode") {
             this.mps = new MultiPlayerSocket(this);

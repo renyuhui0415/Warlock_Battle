@@ -13,6 +13,10 @@ class AcGameMenu {
             多人模式
         </div>
         <br>
+        <div class="ac-game-menu-field-item ac-game-menu-field-item-introduce">
+            游戏说明
+        </div>
+        <br>
         <div class="ac-game-menu-field-item ac-game-menu-field-item-settings">
             注销账号
         </div>
@@ -21,8 +25,10 @@ class AcGameMenu {
 `);
         this.$menu.hide();
         this.root.$ac_game.append(this.$menu);
+
         this.$single_mode = this.$menu.find('.ac-game-menu-field-item-single-mode');
         this.$multi_mode = this.$menu.find('.ac-game-menu-field-item-multi-mode');
+        this.$introduce = this.$menu.find('.ac-game-menu-field-item-introduce');
         this.$settings = this.$menu.find('.ac-game-menu-field-item-settings');
 
         this.start();
@@ -44,6 +50,10 @@ class AcGameMenu {
         this.$multi_mode.click(function(){
             outer.hide();
             outer.root.playground.show("multi mode");
+        });
+        this.$introduce.click(function(){
+            outer.hide();
+            outer.root.introduce.show();
         });
         this.$settings.click(function(){
             outer.root.settings.logout_on_remote();
