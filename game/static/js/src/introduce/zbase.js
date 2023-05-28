@@ -18,17 +18,17 @@ class AcGameIntroduce{
             <h2>游戏模式</h2>
                 <ul>
                     <li>单人模式：8名人机，会随机移动 + 释放技能，你需要把它们全部击杀才能获得游戏的胜利！！！</li>
-                    <li>多人模式：3人一个房间，满3人开始游戏，可以与你的小伙伴们一起同台竞技！！！</li>
+                    <li>多人模式：3人一个房间，满3人开始游戏，快和你的小伙伴们一起同台竞技吧！！！</li>
                 </ul>
         </div>
         <div class="ac-game-introduce-container-return-btn">返回游戏</div>
     </div>
 </div>
 `);
-        this.$introduce.hide();
-        this.root.$ac_game.append(this.$introduce);
+        this.$introduce.hide(); //先隐藏
+        this.root.$ac_game.append(this.$introduce); //添加介绍页面
 
-        this.$return_btn = this.$introduce.find('.ac-game-introduce-container-return-btn');
+        this.$return_btn = this.$introduce.find('.ac-game-introduce-container-return-btn'); //记录按钮，后面需要监视事件
 
         this.start();
     }
@@ -39,7 +39,7 @@ class AcGameIntroduce{
 
     add_listening_events(){
         let outer = this;
-        this.$return_btn.click(function(){
+        this.$return_btn.click(function(){ //点击返回游戏的话，当前页面收起，菜单页面打开
             outer.hide();
             outer.root.menu.show();
         });

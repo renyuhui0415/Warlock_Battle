@@ -117,7 +117,7 @@ class Player extends AcGameObject {
             }
         });
 
-        $(window).keydown(function(e) {
+        this.playground.game_map.$canvas.keydown(function(e) {
             if(outer.playground.state !== "fighting"){
                 return true;
             }
