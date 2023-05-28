@@ -147,8 +147,8 @@ class MultiPlayerSocket{
         this.ws.send(JSON.stringify({
             'event': "message",
             'uuid': outer.uuid,
-            'username': username,
-            'text': text,
+            'username': data['username'],
+            'text': data['text'],
         }));
     }
 

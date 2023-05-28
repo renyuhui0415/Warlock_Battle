@@ -299,7 +299,7 @@ class Settings{
                 platform: outer.platform,
             },
             success: function(resp) {
-                outer.user = resp.user;
+                outer.username = resp.username;
                 outer.photo = resp.photo;
                 if(resp.result === "success") {
                     outer.hide();
