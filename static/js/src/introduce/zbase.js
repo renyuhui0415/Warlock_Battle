@@ -8,10 +8,11 @@ class AcGameIntroduce{
             <div class="ac-game-introduce-container-rules">
                 <h2>游戏玩法</h2>
                     <ul>
-                        <li>玩家通过键盘选择技能，然后通过鼠标进行技能释放、移动角色。</li>
-                        <li>q 键选择火球技能，被击中玩家有3%加速效果，cd：3s；</li>
-                        <li>w 键选择冰球技能，被击中玩家有15%减速效果，cd：3s；</li>
-                        <li>f 键选择闪现技能，可以全局瞬移，cd：5s；</li>
+                        <li>玩家通过键盘选择技能,然后通过鼠标进行技能释放、移动角色;</li>
+                        <li>q 键选择火球技能,被击中玩家有3%加速效果，cd：3s;</li>
+                        <li>w 键选择冰球技能,被击中玩家有15%减速效果，cd：3s;</li>
+                        <li>f 键选择闪现技能,可以全局瞬移，cd：5s;</li>
+                        <li>enter开启问候模式,再次enter即可发送消息，esc退出;</li>
                     </ul>
         </div>
         <div class="ac-game-introduce-container-mode">
