@@ -74,6 +74,7 @@ class MultiPlayer(AsyncWebsocketConsumer):
             if keys:
                 self.room_name = keys[0]
         await self.send(text_data=json.dumps(data))#群发消息
+
     async def move_to(self,data):
         await self.channel_layer.group_send(
                 self.room_name,
@@ -85,54 +86,89 @@ class MultiPlayer(AsyncWebsocketConsumer):
                     'ty': data['ty'],
                     }
                 )
-        async def shoot_ball(self,data):
-            await self.channel_layer.group_send(
-                    self.room_name,
-                    {
-                        'type': "group_send_event",
-                        'event': "shoot_ball",
-                        'uuid': data['uuid'],
-                        'ball_skill': data['ball_skill'],
-                        'tx': data['tx'],
-                        'ty': data['ty'],
-                        'ball_uuid': data['ball_uuid'],
-                        }
-                    )
-            async def attack(self,data):
-                await self.channel_layer.group_send(
-                        self.room_name,
-                        {
-                            'type': "group_send_event",
-                            'event': "attack",
-                            'uuid': data['uuid'],
-                            'attackee_uuid': data['attackee_uuid'],
-                            'x': data['x'],
-                            'y': data['y'],
-                            'angle': data['angle'],
-                            'damage': data['damage'],
-                            'ball_uuid': data['ball_uuid'],
-                            }
-                        )
 
-                async def flash(self,data):
-                    await self.channel_layer.group_send(
-                            self.room_name,
-                            {
-                                'type': "group_send_event",
-                                'event': "flash",
-                                'uuid': data['uuid'],
-                                'tx': data['tx'],
-                                'ty': data['ty'],
-                                }
-                            )
-                    async def message(self,data):
-                        await self.channel_layer.group_send(
-                                self.room_name,
-                                {
-                                    'type': "group_send_event",
-                                    'event': "message",
-                                    'uuid': data['uuid'],
-                                    'username': data['username'],
-                                    'text': data['text'],
-                                    }
-                                )
+    async def shoot_ball(self,data):
+        await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    'type': "group_send_event",
+                    'event': "shoot_ball",
+                    'uuid': data['uuid'],
+                    'ball_skill': data['ball_skill'],
+                    'tx': data['tx'],
+                    'ty': data['ty'],
+                    'ball_uuid': data['ball_uuid'],
+                    }
+                )
+
+    async def attack(self,data):
+        if not self.room_name:
+            return
+
+        players = cache.get(self.room_name)
+
+        if not players:
+            return
+
+        for player in players:
+            if player['uuid'] == data['attackee_uuid']:
+                player['hp'] -= 20
+
+        remain_cnt = 0
+
+        for player in players:
+            if player['hp'] > 0:
+                remain_cnt += 1
+
+        if remain_cnt > 1:
+            if self.room_name:
+                cache.set(self.room_name,players,3600)
+        else:
+            def db_update_player_score(username,score):
+                player = Player.objects.get(user__username=username)
+                player.score += score
+                player.save();
+            for player in players:
+                if player['hp'] <= 0:
+                    await database_sync_to_async(db_update_player_score)(player['username'],-5)
+                else:
+                    await database_sync_to_async(db_update_player_score)(player['username'],10)
+
+        await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    'type': "group_send_event",
+                    'event': "attack",
+                    'uuid': data['uuid'],
+                    'attackee_uuid': data['attackee_uuid'],
+                    'x': data['x'],
+                    'y': data['y'],
+                    'angle': data['angle'],
+                    'damage': data['damage'],
+                    'ball_uuid': data['ball_uuid'],
+                    }
+                )
+
+    async def flash(self,data):
+        await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    'type': "group_send_event",
+                    'event': "flash",
+                    'uuid': data['uuid'],
+                    'tx': data['tx'],
+                    'ty': data['ty'],
+                    }
+                )
+
+    async def message(self,data):
+        await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    'type': "group_send_event",
+                    'event': "message",
+                    'uuid': data['uuid'],
+                    'username': data['username'],
+                    'text': data['text'],
+                    }
+                )

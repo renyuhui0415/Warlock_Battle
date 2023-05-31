@@ -14,12 +14,29 @@ class AcGamePlayground{
         return colors[Math.floor(Math.random() * 7)];
     }
 
-    start(){ //好习惯，可以把初始化操作写里面
+    create_uuid() {
+        let res = "";
+        for (let i = 0; i < 8; i ++ ) {
+            let x = parseInt(Math.floor(Math.random() * 10));  // 返回[0, 1)之间的数
+            res += x;
+        }
+        return res;
+    }
+
+    start() {
         let outer = this;
-        $(window).resize(function(){
+        let uuid = this.create_uuid();
+        $(window).on(`resize.${uuid}`, function() { //监听uuid对应的resize函数
             outer.resize();
         });
+
+        if (this.root.AcWingOS) {
+            this.root.AcWingOS.api.window.on_close(function() { //关闭之前移除uuid对应的resize
+                $(window).off(`resize.${uuid}`);
+            });
+        }
     }
+
 
     resize(){
         this.width = this.$playground.width();
@@ -57,10 +74,14 @@ class AcGamePlayground{
         this.players.push(new Player(this,this.width / 2 / this.scale,0.5,0.06,"white",0.15,"me",this.root.settings.username,this.root.settings.photo));
 
         if(mode === "single mode") {
-            for(let i = 0;i < 8;i++)
+            for(let i = 0;i < 8;i++) {
                 this.players.push(new Player(this,this.width * Math.random() / this.scale,Math.random(),0.06,this.get_random_color(),0.15,"robot"));
+            }
+
+            this.game_over = new GameOver(this,"single mode");
         } else if(mode === "multi mode") {
             this.chat_field = new ChatField(this);
+            this.game_over = new GameOver(this,"multi mode");
             this.mps = new MultiPlayerSocket(this);
             this.mps.uuid = this.players[0].uuid;
 
@@ -71,6 +92,40 @@ class AcGamePlayground{
     }
 
     hide(){ //关闭游戏界面
+        // 由于AcGameObject是所有窗口共用的基类，如果直接清空数组，会导致其他游戏窗口被清空，所有手动删除数组元素
+        //删除玩家和释放的球类技能
+        while(this.players && this.players.length > 0 ){
+            for(let i = 0;i < this.players.length;i++){
+                let now_player = this.players[i];
+                if(now_player.balls && now_player.balls.length > 0){
+                    for(let j = 0;j < now_player.balls.length;j++){
+                        now_player.balls[j].destroy();
+                    }
+                }
+                now_player.destroy();
+            }
+        }
+
+        //删除地图
+        if (this.game_map) {
+            this.game_map.destroy();
+            this.game_map = null;
+        }
+
+        //删除提示框
+        if (this.notice_board) {
+            this.notice_board.destroy();
+            this.notice_board = null;
+        }
+
+        //删除游戏结束弹窗
+        if (this.game_over) {
+            this.game_over.destroy();
+            this.game_over = null;
+        }
+
+        this.$playground.empty(); //清空html对象
+
         this.$playground.hide();
     }
 }

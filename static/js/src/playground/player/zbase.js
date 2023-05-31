@@ -254,12 +254,21 @@ class Player extends AcGameObject {
 
         this.spent_time += this.timedelta / 1000;
 
+        this.update_win();
+
         if(this.role === "me" && this.playground.state === "fighting"){
             this.update_coldtime();
         }
 
         this.update_move();
         this.render();
+    }
+
+    update_win(){
+        if(this.playground.state === "fighting" && this.role === "me" && this.playground.players.length === 1){
+            this.playground.state = "over";
+            this.playground.game_over.win();
+        }
     }
 
     update_coldtime(){
@@ -411,7 +420,10 @@ class Player extends AcGameObject {
 
     on_destroy() {
         if(this.role === "me"){
-            this.playground.state = "over";
+            if(this.playground.state === "fighting"){
+                this.playground.state = "over";
+                this.playground.game_over.lose();
+            }
         }
 
         for (let i = 0; i < this.playground.players.length; i ++ ) {
